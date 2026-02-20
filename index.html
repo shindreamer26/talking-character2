@@ -35,3 +35,198 @@
 <body>
   <div class="wrap">
     <h1>キャラアプリ</h1>
+<div class="card">
+  <div class="hero">
+    <div class="imgbox">
+      <img id="chImg" src="character.png" alt="character" onerror="this.style.display='none';this.parentElement.textContent='画像なし';" />
+    </div>
+    <div class="bubble">
+      <div class="label">ここにセリフが表示されるよ</div>
+      <div id="say" class="say">やっほー！ようこそ夢のダジャレランドへ！まずは何でも話しかけてみてな！</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="row">
+      <label>速度</label>
+      <input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1.0" />
+      <span id="rateV" class="pill">1.0</span>
+      <label style="min-width:36px;">高さ</label>
+      <input id="pitch" type="range" min="0.7" max="1.7" step="0.1" value="1.2" />
+      <span id="pitchV" class="pill">1.2</span>
+      <button id="toggleVoice" class="btn">音声ON</button>
+    </div>
+
+    <div class="row">
+      <input id="text" class="input" placeholder="ここに入力して送信（EnterでもOK）" />
+      <button id="send" class="btn primary">送信</button>
+      <button id="random" class="btn">ランダム台詞</button>
+    </div>
+
+    <div id="toast" class="toast">iPhoneやLINE内ブラウザだと音が出ない時があるよ。Safari/Chromeで開いてみてね。</div>
+    <div class="tiny">コツ：最初の1回だけ、ボタンを押して音声を解放してね（iPhone対策）。</div>
+  </div>
+</div> 
+ </div>
+ <script>
+  const sayEl = document.getElementById("say");
+  const textEl = document.getElementById("text");
+  const rateEl = document.getElementById("rate");
+  const pitchEl = document.getElementById("pitch");
+  const rateV = document.getElementById("rateV");
+  const pitchV = document.getElementById("pitchV");
+  const toast = document.getElementById("toast");
+  const toggleVoiceBtn = document.getElementById("toggleVoice");
+
+  let voiceEnabled = true;
+  let unlocked = false;
+
+  const PHRASES_RANDOM = [
+    "ようこそ〜！今日も絶好調で、ぜっこうちょ〜！",
+    "迷子？大丈夫。まよわず、まよえるのがテーマパーク！",
+    "お腹すいた？それなら…おなかスイート！",
+    "元気ない？元気を出して…げんき出して…げんき出し亭！",
+    "今日は晴れ？はれ？…はれ〜！パレード行こ！",
+    "疲れたら休憩！きゅうけいは…きゅうけい王！",
+    "写真撮ろ！はいチーズ…ちーずっと笑顔で！",
+    "お土産は？おみやげは…おみやげっと！",
+    "アトラクション？あっと驚く…アトラッキューン！",
+    "並ぶのしんどい？でも並べば…ならべば…ならべる場！",
+    "テンション上げてこ！上げるだけに…アゲアゲル！",
+    "きみの笑顔が主役！えがお…えーが…お！",
+    "夢はでっかく！ゆめだけに…ゆめいっぱい！",
+    "怖いの苦手？だいじょぶ、こわくない…こわくナイト！",
+    "最後まで楽しもう！さいごまで…さいこーまで！"
+  ];
+
+  function detectContext(t){
+    const s = (t || "").toLowerCase();
+    if (/(ありがとう|助かった|感謝|thx|thanks)/.test(s)) return "thanks";
+    if (/(疲れ|しんど|だる|つかれ|眠|ねむ)/.test(s)) return "tired";
+    if (/(こんにちは|こんちは|こんばんは|おはよ|やあ|はじめまして|どうも|hi|hello)/.test(s)) return "greeting";
+    if (/(むかつ|イラ|うざ|しね|最悪)/.test(s)) return "angry";
+    if (/(好き|かわいい|推し|最高|いいね)/.test(s)) return "praise";
+    return "normal";
+  }
+
+  function makeReply(userText){
+    const c = detectContext(userText);
+
+    if(c==="greeting"){
+      return "いらっしゃいませー！ここは夢のダジャレランド！テンションはテンション…テンション上げショーンでいくで！";
+    }
+    if(c==="thanks"){
+      return "どういたしまして！感謝の気持ちは観覧車のように、ぐるぐる回って返ってくるで！";
+    }
+    if(c==="tired"){
+      return "お疲れ様やで！ここで一息、ひとやすみして…ヒトヤスミュージアム気分でいこ！";
+    }
+    if(c==="angry"){
+      return "おっと熱くなってる？クールダウンしよ。怒りは置いて…おこりはおこらず、ほっこり行こう！";
+    }
+    if(c==="praise"){
+      return "うれしー！褒め言葉はポップコーンみたいに弾けるな！ぽっぷ！こーん！";
+    }
+
+    const jokes = [
+      "なるほどな！それ、なるほど…なるほどーん！",
+      "それは名案！めいあんだけに…めいアンパン！",
+      "了解！了解だけに…りょーかいもの！",
+      "聞いたで！きいたで…きーたんで！",
+      "任せて！まかせて…まかせ亭！"
+    ];
+
+    const reactions = [
+      "ワクワクが止まらん！",
+      "それ、めっちゃええやん！",
+      "ツッコませて！って思ったけど、今日は優しめでいくわ！",
+      "ほな行こか、その話！",
+      "その発想、アトラクション級！"
+    ];
+
+    const emoji = ["✨","🎡","🎠","🍿","🎈","🌈","🎢"];
+    const pick = a => a[Math.floor(Math.random()*a.length)];
+
+    return pick(reactions) + " " + pick(jokes) + " " + pick(emoji);
+  }
+
+  function speak(text){
+    if(!voiceEnabled) return;
+    if(!("speechSynthesis" in window)) return;
+
+    window.speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ja-JP";
+    u.rate = parseFloat(rateEl.value);
+    u.pitch = parseFloat(pitchEl.value);
+
+    const voices = window.speechSynthesis.getVoices();
+    const ja = voices.find(v => v.lang && v.lang.toLowerCase().includes("ja"));
+    if(ja) u.voice = ja;
+
+    window.speechSynthesis.speak(u);
+  }
+
+  function show(text){
+    sayEl.textContent = text;
+    speak(text);
+  }
+
+  function unlockAudioOnce(){
+    if(unlocked) return;
+    try{
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+    unlocked = true;
+  }
+
+  function isInAppBrowser(){
+    const ua = navigator.userAgent || "";
+    return /Line\/|FBAN|FBAV|Instagram|Twitter|TikTok/.test(ua);
+  }
+
+  function handleSend(){
+    unlockAudioOnce();
+    const t = (textEl.value || "").trim();
+    if(!t){
+      show("空っぽはあかんで！でも大丈夫、空っぽだけに…からっぽーん！何か入れて送ってな！");
+      return;
+    }
+    const reply = makeReply(t);
+    show(reply);
+    textEl.value = "";
+  }
+
+  function handleRandom(){
+    unlockAudioOnce();
+    const r = PHRASES_RANDOM[Math.floor(Math.random()*PHRASES_RANDOM.length)];
+    show(r);
+  }
+
+  rateEl.addEventListener("input", ()=> rateV.textContent = rateEl.value);
+  pitchEl.addEventListener("input", ()=> pitchV.textContent = pitchEl.value);
+
+  document.getElementById("send").addEventListener("click", handleSend);
+  document.getElementById("random").addEventListener("click", handleRandom);
+  textEl.addEventListener("keydown", (e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      handleSend();
+    }
+  });
+
+  toggleVoiceBtn.addEventListener("click", ()=>{
+    voiceEnabled = !voiceEnabled;
+    toggleVoiceBtn.textContent = voiceEnabled ? "音声ON" : "音声OFF";
+    if(!voiceEnabled) window.speechSynthesis.cancel();
+  });
+
+  if(isInAppBrowser()){
+    toast.classList.add("show");
+  }
+</script>
+</body>
+</html>
