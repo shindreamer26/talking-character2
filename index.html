@@ -1,0 +1,37 @@
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>キャラアプリ</title>
+  <style>
+    :root { --bg:#fff7fb; --panel:#ffffff; --text:#222; --muted:#666; --accent:#ff4fa1; --line:#e9e9e9; }
+    html,body{height:100%;}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:linear-gradient(160deg,var(--bg),#f0fbff);color:var(--text);}
+    .wrap{max-width:720px;margin:0 auto;padding:18px 14px 24px;box-sizing:border-box;}
+    h1{margin:4px 0 14px;font-size:20px;font-weight:700;}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,.06);overflow:hidden;}
+    .hero{display:flex;gap:14px;align-items:flex-start;padding:14px;}
+    .imgbox{width:120px;height:120px;border-radius:16px;background:#f2f2f2;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 auto;}
+    .imgbox img{width:100%;height:100%;object-fit:cover;display:block;}
+    .bubble{flex:1 1 auto;min-height:120px;border-radius:16px;background:#fff;border:1px solid var(--line);padding:12px 12px 10px;position:relative;}
+    .bubble:before{content:"";position:absolute;left:-10px;top:24px;width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-right:10px solid #fff;}
+    .bubble:after{content:"";position:absolute;left:-11px;top:24px;width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-right:10px solid var(--line);}
+    .bubble .label{font-size:12px;color:var(--muted);margin-bottom:8px;}
+    .bubble .say{font-size:16px;line-height:1.6;white-space:pre-wrap;}
+    .controls{padding:12px 14px 14px;border-top:1px solid var(--line);display:grid;gap:10px;}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .row label{font-size:12px;color:var(--muted);min-width:44px;}
+    input[type="range"]{flex:1 1 200px;}
+    .pill{font-size:12px;color:var(--muted);}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;font-size:14px;cursor:pointer;}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+    .btn:active{transform:translateY(1px);}
+    .input{flex:1 1 280px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;}
+    .tiny{font-size:12px;color:var(--muted);line-height:1.5;}
+    .toast{display:none;margin-top:8px;padding:10px 12px;border-radius:12px;background:#fff3f9;border:1px solid #ffd1e6;color:#b3005a;font-size:12px;}
+    .toast.show{display:block;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>キャラアプリ</h1>
